@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Specialized Tracker</title>
+    <style>
+        :root {
+            --primary-color: #ff7e67; 
+            --bg-color: #1a1a2e; 
+            --card-bg: #16213e;
+            --text-color: #e94560;
+            --light-text: #fff;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--light-text);
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        h1, h2, h3 { color: var(--text-color); margin-top: 0; }
+        
+        /* Navigation Tabs */
+        .tabs {
+            display: flex; gap: 10px; margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px;
+        }
+        .tab-btn {
+            background: transparent; color: #aaa; border: none; 
+            font-size: 1.1em; font-weight: bold; cursor: pointer; padding: 10px 15px;
+            border-radius: 8px; transition: 0.3s;
+        }
+        .tab-btn.active {
+            background: var(--primary-color); color: white;
+        }
+        .tab-btn:hover:not(.active) { color: white; background: rgba(255,255,255,0.1); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Quote Box */
+        .quote-box {
+            font-style: italic; text-align: center;
+            background: rgba(255, 255, 255, 0.05); padding: 15px;
+            border-radius: 8px; margin-bottom: 25px;
+            border-left: 4px solid var(--primary-color);
+        }
+        .quote-author { font-weight: bold; margin-top: 5px; color: var(--primary-color); font-size: 0.9em; }
+
+        /* Exam Countdown */
+        .exam-countdown {
+            background: rgba(255, 255, 255, 0.05); padding: 20px;
+            border-radius: 8px; margin-bottom: 30px; text-align: center;
+        }
+        .countdown-grid { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
+        .countdown-box {
+            background: var(--bg-color); border: 2px solid var(--primary-color);
+            border-radius: 8px; padding: 15px; min-width: 120px;
+        }
+        .countdown-box .days { font-size: 2.2em; font-weight: bold; color: var(--primary-color); }
+
+        /* Graphics: 7-Day History */
+        .history-section { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .history-grid { display: flex; gap: 10px; align-items: flex-end; height: 100px; margin-top: 15px; }
+        .bar-container { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
+        .bar { width: 100%; background-color: var(--primary-color); border-radius: 4px 4px 0 0; transition: height 0.5s; }
+        .bar-label { font-size: 0.7em; margin-top: 5px; color: #aaa; }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%; background-color: rgba(255,255,255,0.1);
+            border-radius: 8px; margin: 15px 0 25px 0; height: 20px; overflow: hidden;
+        }
+        .progress-bar { height: 100%; background-color: var(--primary-color); width: 0%; transition: width 0.4s ease; }
+        .progress-text { text-align: center; font-weight: bold; }
+
+        /* Forms & Inputs */
+        .input-group, .log-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .input-row { display: flex; gap: 10px; }
+        input[type="text"], select, textarea {
+            padding: 10px; border: none; border-radius: 6px;
+            background: rgba(255,255,255,0.9); color: #333; font-weight: bold; width: 100%; box-sizing: border-box;
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        button {
+            padding: 10px 20px; background-color: var(--primary-color); color: white;
+            border: none; border-radius: 6px; cursor: pointer; font-weight: bold;
+        }
+        button:hover { filter: brightness(1.1); }
+
+        /* Lists */
+        ul { list-style-type: none; padding: 0; }
+        li {
+            background: rgba(255,255,255,0.05); margin: 8px 0; padding: 12px;
+            border-radius: 6px; display: flex; flex-direction: column; gap: 10px;
+            border-left: 4px solid var(--text-color);
+        }
+        li.completed .task-text { text-decoration: line-through; color: #888; }
+        li.completed { border-left-color: #555; }
+        
+        .task-header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .task-info { display: flex; align-items: center; gap: 10px; }
+        .subject-tag { font-size: 0.8em; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 12px; }
+        .delete-btn { background: #ff4d4d; padding: 6px 10px; border-radius: 4px; border: none; color: white; cursor: pointer; }
+
+        /* Podcast Specific */
+        .podcast-log { background: #1a1a2e; padding: 15px; border-radius: 8px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .log-section h4 { margin: 0 0 5px 0; color: var(--primary-color); font-size: 0.9em; text-transform: uppercase; }
+        .log-section p { margin: 0 0 15px 0; font-size: 0.95em; line-height: 1.4; color: #ddd; }
+        .log-date { font-size: 0.8em; color: #888; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="quote-box">
+        <div id="quoteText">"Loading inspiration..."</div>
+        <div class="quote-author" id="quoteAuthor"></div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('studyTab')">Study Planner</button>
+        <button class="tab-btn" onclick="switchTab('podcastTab')">Interview & Podcasts</button>
+    </div>
+
+    <div id="studyTab" class="tab-content active">
+        <div class="exam-countdown">
+            <h3>UPSC 2026 Countdown</h3>
+            <div class="countdown-grid">
+                <div class="countdown-box">
+                    <div class="days" id="prelimsDays">--</div>
+                    <div class="label">Days to Prelims<br><small>(May 24)</small></div>
+                </div>
+                <div class="countdown-box">
+                    <div class="days" id="mainsDays">--</div>
+                    <div class="label">Days to Mains<br><small>(Aug 21)</small></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h3>Past 7 Days Completion</h3>
+            <div class="history-grid" id="historyGrid"></div>
+        </div>
+
+        <h1>Today's Plan</h1>
+        
+        <div class="progress-text" id="progressText">0% Completed</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <form class="input-group" id="taskForm">
+            <div class="input-row">
+                <input type="text" id="taskInput" placeholder="Enter topic to cover..." required>
+                <select id="subjectSelect">
+                    <option value="History Optional">History Optional</option>
+                    <option value="GS 2 (Polity)">GS 2</option>
+                    <option value="GS 3 (Economy)">GS 3</option>
+                    <option value="GS 4 (Ethics)">GS 4</option>
+                    <option value="Current Affairs">Current Affairs</option>
+                    <option value="CSAT">CSAT</option>
+                </select>
+            </div>
+            <button type="submit">Add Target</button>
+        </form>
+        <ul id="taskList"></ul>
+
+        <div>
+            <h3>Daily Habits</h3>
+            <ul id="habitList">
+                <li>
+                    <div class="task-header">
+                        <div class="task-info">
+                            <input type="checkbox" id="habitExercise" onchange="updateProgress()">
+                            <span class="task-text">Physical Exercise / Cycling</span>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="task-header">
+                        <div class="task-info">
+                            <input type="checkbox" id="habitHealth" onchange="updateProgress()">
+                            <span class="task-text">Wellness / Ayurvedic Routine</span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="podcastTab" class="tab-content">
+        <h2>Podcast & Interview Insights</h2>
+        <p style="color: #aaa; font-size: 0.9em;">Log daily summaries from your podcasts and map how you can use these insights in the UPSC Personality Test.</p>
+        
+        <form class="log-form" id="podcastForm">
+            <input type="text" id="podTitle" placeholder="Podcast Name / Episode Topic" required>
+            <textarea id="podLearnt" placeholder="What I Learnt (Key takeaways, stats, quotes...)" required></textarea>
+            <textarea id="podUtility" placeholder="How to use in Interview (Which GS paper, DAF connection, opinion forming...)" required></textarea>
+            <button type="submit">Save Log to Journal</button>
+        </form>
+
+        <ul id="podcastList"></ul>
+    </div>
+</div>
+
+<script>
+    // Tab Switching Logic
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Quotes Array
+    const quotes = [
+        { text: "I'm not gonna run away, I never go back on my word! That's my nindo: my ninja way!", author: "Naruto Uzumaki" },
+        { text: "If you don't like your destiny, don't accept it. Instead have the courage to change it.", author: "Naruto Uzumaki" },
+        { text: "A dropout will beat a genius through hard work.", author: "Rock Lee" },
+        { text: "If you fall, just get back up and start pedaling again. We move forward together.", author: "Shingo Kinjou (Yowamushi Pedal)" },
+        { text: "I will turn my pedals! I will move forward! I will catch up to them!", author: "Sakamichi Onoda (Yowamushi Pedal)" }
+    ];
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    document.getElementById('quoteText').innerText = `"${randomQuote.text}"`;
+    document.getElementById('quoteAuthor').innerText = `- ${randomQuote.author}`;
+
+    // Countdown Logic
+    const prelimsDate = new Date('May 24, 2026').getTime();
+    const mainsDate = new Date('August 21, 2026').getTime();
+    const now = new Date().getTime();
+    const pDays = Math.ceil((prelimsDate - now) / (1000 * 60 * 60 * 24));
+    const mDays = Math.ceil((mainsDate - now) / (1000 * 60 * 60 * 24));
+    document.getElementById('prelimsDays').innerText = pDays > 0 ? pDays : 0;
+    document.getElementById('mainsDays').innerText = mDays > 0 ? mDays : 0;
+
+    // App State
+    let tasks = JSON.parse(localStorage.getItem('studyTargets')) || [];
+    let history = JSON.parse(localStorage.getItem('studyHistory')) || [];
+    let podcasts = JSON.parse(localStorage.getItem('podcastLogs')) || [];
+    let lastLogin = localStorage.getItem('lastLoginDate');
+    const today = new Date().toLocaleDateString();
+
+    // Daily Reset Logic
+    if (lastLogin !== today) {
+        if (lastLogin) {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+            history.push({ date: lastLogin, score: percent });
+            if (history.length > 7) history.shift();
+            localStorage.setItem('studyHistory', JSON.stringify(history));
+        }
+        tasks = [];
+        localStorage.setItem('lastLoginDate', today);
+        localStorage.setItem('studyTargets', JSON.stringify(tasks));
+        localStorage.setItem('habitExercise', 'false');
+        localStorage.setItem('habitHealth', 'false');
+    }
+
+    document.getElementById('habitExercise').checked = JSON.parse(localStorage.getItem('habitExercise')) || false;
+    document.getElementById('habitHealth').checked = JSON.parse(localStorage.getItem('habitHealth')) || false;
+
+    // Study Planner Functions
+    function renderHistory() {
+        const historyGrid = document.getElementById('historyGrid');
+        historyGrid.innerHTML = '';
+        if (history.length === 0) {
+            historyGrid.innerHTML = '<div style="color: #aaa; font-size: 0.9em;">Complete tasks today to see your chart grow!</div>';
+            return;
+        }
+        history.forEach(day => {
+            const barCont = document.createElement('div');
+            barCont.className = 'bar-container';
+            const shortDate = day.date.split('/').slice(0, 2).join('/'); 
+            barCont.innerHTML = `
+                <div class="bar" style="height: ${day.score}%"></div>
+                <div class="bar-label">${shortDate}</div>
+            `;
+            historyGrid.appendChild(barCont);
+        });
+    }
+
+    document.getElementById('taskForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        tasks.push({
+            id: Date.now(),
+            text: document.getElementById('taskInput').value,
+            subject: document.getElementById('subjectSelect').value,
+            completed: false
+        });
+        document.getElementById('taskInput').value = '';
+        saveAndRenderTasks();
+    });
+
+    window.toggleTask = function(id) {
+        tasks = tasks.map(task => { if (task.id === id) task.completed = !task.completed; return task; });
+        saveAndRenderTasks();
+    }
+
+    window.deleteTask = function(id) {
+        tasks = tasks.filter(task => task.id !== id);
+        saveAndRenderTasks();
+    }
+
+    window.updateProgress = function() {
+        const habit1 = document.getElementById('habitExercise').checked;
+        const habit2 = document.getElementById('habitHealth').checked;
+        localStorage.setItem('habitExercise', habit1);
+        localStorage.setItem('habitHealth', habit2);
+
+        let completedCount = tasks.filter(t => t.completed).length;
+        let totalItems = tasks.length + 2; 
+        if(habit1) completedCount++;
+        if(habit2) completedCount++;
+
+        const progressPercentage = totalItems === 0 ? 0 : Math.round((completedCount / totalItems) * 100);
+        document.getElementById('progressBar').style.width = progressPercentage + '%';
+        document.getElementById('progressText').innerText = `${progressPercentage}% Completed`;
+    }
+
+    function saveAndRenderTasks() {
+        localStorage.setItem('studyTargets', JSON.stringify(tasks));
+        const taskList = document.getElementById('taskList');
+        taskList.innerHTML = '';
+        tasks.forEach(task => {
+            const li = document.createElement('li');
+            if (task.completed) li.classList.add('completed');
+            li.innerHTML = `
+                <div class="task-header">
+                    <div class="task-info">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="toggleTask(${task.id})">
+                        <span class="task-text">${task.text}</span>
+                        <span class="subject-tag">${task.subject}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">X</button>
+                </div>
+            `;
+            taskList.appendChild(li);
+        });
+        updateProgress();
+        renderHistory();
+    }
+
+    // Podcast Journal Functions
+    document.getElementById('podcastForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        podcasts.unshift({ // Add to top of array
+            id: Date.now(),
+            date: new Date().toLocaleDateString(),
+            title: document.getElementById('podTitle').value,
+            learnt: document.getElementById('podLearnt').value,
+            utility: document.getElementById('podUtility').value
+        });
+        document.getElementById('podTitle').value = '';
+        document.getElementById('podLearnt').value = '';
+        document.getElementById('podUtility').value = '';
+        saveAndRenderPodcasts();
+    });
+
+    window.deletePodcast = function(id) {
+        podcasts = podcasts.filter(p => p.id !== id);
+        saveAndRenderPodcasts();
+    }
+
+    function saveAndRenderPodcasts() {
+        localStorage.setItem('podcastLogs', JSON.stringify(podcasts));
+        const podcastList = document.getElementById('podcastList');
+        podcastList.innerHTML = '';
+        podcasts.forEach(pod => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="task-header">
+                    <span class="task-text" style="font-weight:bold; color: var(--primary-color);">${pod.title}</span>
+                    <button class="delete-btn" onclick="deletePodcast(${pod.id})">Delete</button>
+                </div>
+                <div class="podcast-log">
+                    <div class="log-date">Logged on: ${pod.date}</div>
+                    <div class="log-section">
+                        <h4>What I Learnt</h4>
+                        <p>${pod.learnt.replace(/\n/g, '<br>')}</p>
+                    </div>
+                    <div class="log-section">
+                        <h4>Interview Utility</h4>
+                        <p>${pod.utility.replace(/\n/g, '<br>')}</p>
+                    </div>
+                </div>
+            `;
+            podcastList.appendChild(li);
+        });
+    }
+
+    // Initial Renders
+    saveAndRenderTasks();
+    saveAndRenderPodcasts();
+</script>
+
+</body>
+</html>
