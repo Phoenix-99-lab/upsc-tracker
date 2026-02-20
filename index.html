@@ -1,375 +1,478 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPSC Command Center</title>
+    <title>UPSC Command Center V6: The Final Push</title>
     <style>
+        /* THEME VARIABLES */
         :root {
-            --primary-color: #00d2ff; 
-            --secondary-color: #3a7bd5;
-            --bg-color: #0b0c10; 
-            --card-bg: rgba(31, 40, 51, 0.9);
-            --text-color: #66fcf1;
-            --light-text: #c5c6c7;
+            --bg-color: #08090a; --card-bg: rgba(20, 25, 30, 0.95);
+            --primary-color: #00d2ff; --secondary-color: #3a7bd5; --accent-color: #ffaa00;
+            --success: #00ff88; --danger: #ff4d4d; --text-color: #66fcf1; --light-text: #d1d5db;
         }
-        
-        /* Technical Background */
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: var(--bg-color);
-            background-image: 
-                linear-gradient(rgba(102, 252, 241, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(102, 252, 241, 0.05) 1px, transparent 1px);
-            background-size: 30px 30px;
-            color: var(--light-text);
-            max-width: 700px;
-            margin: 40px auto;
-            padding: 20px;
+        [data-theme="notion"] {
+            --bg-color: #f7f7f5; --card-bg: #ffffff;
+            --primary-color: #111; --secondary-color: #e0e0e0; --accent-color: #d9534f;
+            --success: #5cb85c; --danger: #d9534f; --text-color: #37352f; --light-text: #505050;
+        }
+        [data-theme="forest"] {
+            --bg-color: #1b261b; --card-bg: #223322;
+            --primary-color: #4ade80; --secondary-color: #16a34a; --accent-color: #fbbf24;
+            --success: #4ade80; --danger: #f87171; --text-color: #bbf7d0; --light-text: #e2e8f0;
         }
 
-        .container {
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
-            border: 1px solid rgba(102, 252, 241, 0.2);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
-            backdrop-filter: blur(10px);
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color); color: var(--light-text);
+            max-width: 900px; margin: 20px auto; padding: 20px; transition: background 0.3s;
         }
-        
-        h1, h2, h3 { color: var(--text-color); margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
+
+        .container { background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(128,128,128,0.2); transition: 0.3s; }
+        h1, h2, h3 { color: var(--text-color); margin-top: 0; text-transform: uppercase; font-family: 'Courier New', Courier, monospace; letter-spacing: 1px;}
+
+        /* Theme Selector */
+        .theme-selector { display: flex; justify-content: flex-end; margin-bottom: 10px; gap: 10px; align-items: center; font-size: 0.8em; }
+        .theme-selector select { padding: 5px; border-radius: 4px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--primary-color); outline: none;}
+
+        /* Daant Modal (The Discipline Enforcer) */
+        #daantModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); z-index: 1000; justify-content: center; align-items: center; text-align: center;
+        }
+        .daant-content { background: #1a0000; padding: 40px; border-radius: 12px; border: 2px solid var(--danger); max-width: 600px; color: #fff; box-shadow: 0 0 50px rgba(255,0,0,0.3); }
+        .daant-content h1 { color: var(--danger); font-size: 2.5em; margin-bottom: 15px; text-shadow: 0 0 10px var(--danger); }
+        .daant-content p { font-size: 1.15em; line-height: 1.6; margin-bottom: 20px; color: #ddd; }
+        .daant-content button { padding: 15px 30px; background: var(--danger); color: white; border: none; font-size: 1.1em; font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.2s; letter-spacing: 1px;}
+        .daant-content button:hover { background: darkred; box-shadow: 0 0 15px var(--danger); }
+
+        /* Header Grid (Quotes & Countdowns) */
+        .header-panel { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
+        .quote-box { background: rgba(128,128,128,0.05); border-left: 4px solid var(--danger); padding: 18px; font-style: italic; border-radius: 0 8px 8px 0; }
+        .countdown-grid { display: flex; gap: 15px; justify-content: center; }
+        .countdown-box { background: rgba(128,128,128,0.05); border: 1px solid var(--primary-color); border-radius: 8px; padding: 15px; text-align: center; flex: 1; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+        .countdown-box .days { font-size: 2.2em; font-weight: bold; color: var(--primary-color); text-shadow: 0 0 10px rgba(0,210,255,0.2); }
 
         /* Navigation Tabs */
-        .tabs {
-            display: flex; gap: 10px; margin-bottom: 25px;
-            border-bottom: 1px solid rgba(102, 252, 241, 0.3); padding-bottom: 10px;
-            overflow-x: auto;
-        }
-        .tab-btn {
-            background: transparent; color: #888; border: none; 
-            font-size: 1em; font-weight: bold; cursor: pointer; padding: 10px 15px;
-            border-radius: 4px; transition: 0.3s; white-space: nowrap;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .tab-btn.active { background: var(--secondary-color); color: white; box-shadow: 0 0 10px var(--secondary-color); }
-        .tab-btn:hover:not(.active) { color: var(--text-color); background: rgba(102, 252, 241, 0.1); }
+        .tabs { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 1px solid rgba(128,128,128,0.2); overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: transparent; color: var(--light-text); border: none; font-weight: bold; cursor: pointer; padding: 12px 15px; font-size: 0.85em; transition: 0.3s; white-space: nowrap; font-family: 'Courier New', monospace; letter-spacing: 1px; }
+        .tab-btn.active { border-bottom: 3px solid var(--primary-color); color: var(--text-color); background: rgba(128,128,128,0.05); border-radius: 4px 4px 0 0; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Timer / Stopwatch */
-        .timer-container {
-            text-align: center; margin-bottom: 25px; padding: 15px;
-            border: 1px solid var(--primary-color); border-radius: 8px;
-            background: rgba(0, 0, 0, 0.5);
-        }
-        .time-display { font-size: 3em; color: var(--text-color); font-weight: bold; text-shadow: 0 0 10px var(--primary-color); }
-        .timer-btns button { margin: 5px; padding: 8px 15px; background: transparent; border: 1px solid var(--primary-color); color: var(--text-color); }
+        /* Timer Focus Engine */
+        .timer-container { text-align: center; margin-bottom: 25px; padding: 25px; border: 1px solid var(--primary-color); border-radius: 10px; background: rgba(128,128,128,0.05); position: relative;}
+        .timer-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--primary-color), transparent); }
+        .time-display { font-size: 4em; color: var(--text-color); font-weight: bold; margin-bottom: 15px; font-family: 'Courier New', monospace; text-shadow: 0 0 15px rgba(0,210,255,0.3);}
+        .timer-btns { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+        .timer-btns button { padding: 10px 20px; font-weight: bold; background: rgba(128,128,128,0.1); border: 1px solid var(--primary-color); color: var(--text-color); cursor: pointer; border-radius: 4px; transition: 0.2s; }
         .timer-btns button:hover { background: var(--primary-color); color: #000; }
+        .timer-btns .pomo-btn { background: var(--success); color: #000; border: none; }
+        .timer-btns .log-btn { background: var(--accent-color); color: #000; border: none; }
 
-        /* Forms & Inputs */
-        .input-group, .log-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        .row { display: flex; gap: 10px; }
-        input[type="text"], input[type="number"], select, textarea {
-            padding: 10px; border: 1px solid rgba(102, 252, 241, 0.3); border-radius: 4px;
-            background: rgba(0,0,0,0.6); color: var(--light-text); font-family: inherit; width: 100%; box-sizing: border-box;
-        }
-        textarea { resize: vertical; min-height: 80px; }
-        button.action-btn {
-            padding: 10px 20px; background-color: var(--secondary-color); color: white;
-            border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-family: inherit; text-transform: uppercase;
-        }
-        button.action-btn:hover { background-color: var(--primary-color); box-shadow: 0 0 15px var(--primary-color); color: #000; }
+        /* Habit Grid */
+        .habit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .habit-card { background: rgba(128,128,128,0.08); padding: 15px; border-radius: 8px; border-left: 3px solid var(--success); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s;}
+        .habit-card:hover { background: rgba(128,128,128,0.15); }
+        .habit-card input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--success); }
 
-        /* Lists & Logs */
-        ul { list-style-type: none; padding: 0; }
-        li {
-            background: rgba(0,0,0,0.4); margin: 8px 0; padding: 15px;
-            border-radius: 4px; border-left: 3px solid var(--text-color);
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .subject-tag { font-size: 0.8em; background: rgba(102, 252, 241, 0.2); color: var(--text-color); padding: 3px 8px; border-radius: 12px; }
-        .delete-btn { background: #ff4d4d; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        /* Inputs, Buttons, General Layout */
+        .row { display: flex; gap: 10px; margin-bottom: 15px; }
+        input[type="text"], input[type="number"], select, textarea { padding: 12px; border: 1px solid rgba(128,128,128,0.3); border-radius: 6px; background: rgba(0,0,0,0.2); color: var(--text-color); width: 100%; box-sizing: border-box; font-family: inherit; transition: 0.3s;}
+        input:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 8px rgba(0,210,255,0.2); }
+        button.action-btn { width: 100%; padding: 14px; background: linear-gradient(45deg, var(--secondary-color), var(--primary-color)); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; transition: 0.2s;}
+        button.action-btn:hover { filter: brightness(1.2); box-shadow: 0 0 15px rgba(0,210,255,0.3);}
 
-        /* Mains Log Specific */
-        .mains-stats { display: flex; gap: 10px; align-items: center; margin-bottom: 5px; }
-        .q-count { font-size: 1.2em; font-weight: bold; color: #ffeb3b; }
-        .mistake-box { background: rgba(255, 77, 77, 0.1); border-left: 2px solid #ff4d4d; padding: 10px; margin-top: 5px; font-size: 0.9em; }
+        /* Lists */
+        ul { list-style: none; padding: 0; }
+        li { background: rgba(128,128,128,0.08); margin: 10px 0; padding: 15px; border-radius: 6px; border-left: 3px solid var(--text-color); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .del-btn { background: rgba(255,77,77,0.1); color: var(--danger); border: 1px solid var(--danger); padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8em; font-weight: bold; transition: 0.2s; }
+        .del-btn:hover { background: var(--danger); color: white; }
 
+        /* Revision Checks */
+        .revision-checks { display: flex; gap: 15px; margin-top: 10px; font-size: 0.85em; color: var(--light-text); background: rgba(128,128,128,0.05); padding: 10px; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        .revision-checks label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .revision-checks input { accent-color: var(--accent-color); }
+
+        /* Syllabus Accordion */
+        details { background: rgba(128,128,128,0.05); margin-bottom: 10px; border-radius: 6px; border: 1px solid rgba(128,128,128,0.1); }
+        summary { padding: 15px; cursor: pointer; font-weight: bold; color: var(--text-color); outline: none; transition: 0.2s; }
+        summary:hover { background: rgba(128,128,128,0.1); }
+        .syllabus-items { padding: 15px; border-top: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; gap: 10px; }
+        .syllabus-items label { display: flex; align-items: center; gap: 12px; font-size: 0.95em; cursor: pointer; }
+        .syllabus-items input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-color); }
+        .progress-container { width: 100%; background: rgba(0,0,0,0.5); border-radius: 8px; height: 18px; margin: 15px 0; overflow: hidden; border: 1px solid rgba(128,128,128,0.2); }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--danger), var(--accent-color), var(--success)); width: 0%; transition: width 0.5s ease; }
+
+        /* Analytics Chart & Session Logs */
+        .chart-container { display: flex; align-items: flex-end; gap: 12px; height: 200px; margin-top: 20px; padding: 15px; background: rgba(128,128,128,0.05); border-radius: 8px; border-bottom: 2px solid var(--primary-color); }
+        .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+        .chart-bar { width: 100%; background: linear-gradient(0deg, var(--secondary-color), var(--primary-color)); border-radius: 4px 4px 0 0; min-height: 5px; transition: height 0.8s ease-out; position: relative; }
+        .chart-val { font-size: 0.75em; margin-bottom: 8px; color: var(--text-color); font-weight: bold; }
+        .chart-label { font-size: 0.7em; margin-top: 8px; color: var(--light-text); }
+        .session-log { font-size: 0.85em; color: var(--light-text); background: rgba(128,128,128,0.1); padding: 8px; margin-top: 5px; border-radius: 4px; width: 100%; box-sizing: border-box; border-left: 2px solid var(--primary-color);}
     </style>
 </head>
 <body>
 
+<div id="daantModal">
+    <div class="daant-content">
+        <h1>STREAK BROKEN!</h1>
+        <p>Tumne kal theek se padhai nahi ki. Yaad hai tumne is exam ke liye kya khoya hai? <strong>Tumne apna pyaar kurbaan kiya hai.</strong></p>
+        <p>Wo tumhe chhod kar gaye kyunki unhein laga tumse nahi hoga. Aur aaj tum waise hi behave kar rahe ho? Tumhare maa-baap tumhare successful hone ka wait kar rahe hain aur tum yahan waqt barbaad kar rahe ho?</p>
+        <p style="color: var(--accent-color); font-style: italic;">"Is dard ko apni taqat banao. LBSNAA is waiting."</p>
+        <button onclick="dismissDaant()">I ACCEPT MY MISTAKE. I WILL CONQUER TODAY.</button>
+    </div>
+</div>
+
 <div class="container">
-    
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('studyTab')">TARGETS & TIMER</button>
-        <button class="tab-btn" onclick="switchTab('mainsTab')">MAINS ANSWER WRITING</button>
-        <button class="tab-btn" onclick="switchTab('podcastTab')">PODCASTS</button>
+    <div class="theme-selector">
+        <label>System Theme: </label>
+        <select id="themeSelect" onchange="changeTheme()">
+            <option value="dark">Hacker Dark (Night)</option>
+            <option value="notion">Notion Light (Day)</option>
+            <option value="forest">Forest Focus (Zen)</option>
+        </select>
     </div>
 
-    <div id="studyTab" class="tab-content active">
-        
+    <div class="header-panel">
+        <div class="quote-box">
+            <div id="quoteText" style="font-weight: bold; font-size: 1.1em; line-height: 1.4;">Loading wisdom...</div>
+            <div id="quoteAuthor" style="color: var(--danger); font-size: 0.85em; margin-top: 8px; font-weight: bold; letter-spacing: 1px;"></div>
+        </div>
+        <div class="countdown-grid">
+            <div class="countdown-box"><div class="days" id="preDays">--</div><small style="color:var(--light-text); text-transform:uppercase;">Days to Prelims</small></div>
+            <div class="countdown-box"><div class="days" id="mainsDays">--</div><small style="color:var(--light-text); text-transform:uppercase;">Days to Mains</small></div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('dashTab')">DASHBOARD</button>
+        <button class="tab-btn" onclick="switchTab('sylTab')">SYLLABUS</button>
+        <button class="tab-btn" onclick="switchTab('revTab')">REVISION RADAR</button>
+        <button class="tab-btn" onclick="switchTab('mainsTab')">MAINS ENGINE</button>
+        <button class="tab-btn" onclick="switchTab('podTab')">PODCASTS</button>
+        <button class="tab-btn" onclick="switchTab('statTab')">ANALYTICS & SESSIONS</button>
+    </div>
+
+    <div id="dashTab" class="tab-content active">
         <div class="timer-container">
-            <h3>Active Study Session</h3>
+            <h3 style="margin-bottom: 5px;">Focus Engine</h3>
             <div class="time-display" id="display">00:00:00</div>
             <div class="timer-btns">
                 <button onclick="startTimer()">Start</button>
                 <button onclick="pauseTimer()">Pause</button>
                 <button onclick="resetTimer()">Reset</button>
+                <button class="pomo-btn" onclick="startPomodoro()">50m Pomodoro</button>
+                <button class="log-btn" onclick="logStudySession()">Log Session</button>
             </div>
         </div>
 
-        <h3>Add Daily Target</h3>
-        <form class="input-group" id="taskForm">
-            <div class="row">
-                <input type="text" id="taskInput" placeholder="Topic to cover..." required>
-                <select id="subjectSelect">
-                    <option value="GS 1">GS 1</option>
-                    <option value="GS 2">GS 2</option>
-                    <option value="GS 3">GS 3</option>
-                    <option value="GS 4">GS 4</option>
-                    <option value="CSAT">CSAT</option>
-                    <option value="Current Affairs">Current Affairs</option>
-                </select>
-            </div>
-            <button type="submit" class="action-btn">Initialize Target</button>
-        </form>
+        <h3>Daily Habits & Wellness</h3>
+        <div class="habit-grid">
+            <label class="habit-card">
+                <input type="checkbox" id="habitCycle" onchange="saveHabits()">
+                <div><strong style="color:var(--success)">Cycling / Cardio</strong><br><small style="color:var(--light-text)">Keep the pedals moving</small></div>
+            </label>
+            <label class="habit-card">
+                <input type="checkbox" id="habitAyur" onchange="saveHabits()">
+                <div><strong style="color:var(--success)">Ayurvedic Routine</strong><br><small style="color:var(--light-text)">Wellness & Immunity</small></div>
+            </label>
+        </div>
+
+        <h3>Micro-Targets (To-Do)</h3>
+        <div class="row">
+            <input type="text" id="taskInput" placeholder="What will you conquer next?" required>
+            <select id="taskSub" style="width: 35%;">
+                <option>History</option><option>GS 1</option><option>GS 2</option><option>GS 3</option><option>GS 4</option><option>CSAT</option>
+            </select>
+        </div>
+        <button onclick="addTask()" class="action-btn">Initialize Target</button>
         <ul id="taskList"></ul>
     </div>
 
-    <div id="mainsTab" class="tab-content">
-        <h2>Answer Writing Engine</h2>
-        <p style="color: #888; font-size: 0.9em;">Track your daily written questions and map your exact mistakes.</p>
-        
-        <form class="log-form" id="mainsForm">
-            <div class="row">
-                <select id="mainsSubject" required>
-                    <optgroup label="History Optional">
-                        <option value="History - Ancient">Ancient India</option>
-                        <option value="History - Medieval">Medieval India</option>
-                        <option value="History - Modern">Modern India</option>
-                        <option value="History - World">World History</option>
-                    </optgroup>
-                    <optgroup label="General Studies">
-                        <option value="GS 1 (Society/Geo)">GS 1 (Society/Geo)</option>
-                        <option value="GS 2 (Polity)">GS 2 (Polity/IR)</option>
-                        <option value="GS 3 (Econ/Sec)">GS 3 (Econ/Security)</option>
-                        <option value="GS 4 (Ethics)">GS 4 (Ethics Case Studies)</option>
-                    </optgroup>
-                </select>
-                <input type="number" id="qCount" placeholder="No. of Qs Written" min="1" required style="width: 40%;">
-            </div>
-            <textarea id="mainsMistakes" placeholder="Learnings & Mistakes (e.g., Missed Amir Khusrau's socio-cultural context in Delhi Sultanate answer, or structure was poor in GS3 security question...)" required></textarea>
-            <button type="submit" class="action-btn">Log Answer Writing Session</button>
-        </form>
+    <div id="sylTab" class="tab-content">
+        <h2>UPSC Macro-Syllabus</h2>
+        <div style="display: flex; justify-content: space-between; font-size: 0.9em;">
+            <span>Overall Battle Progress</span>
+            <span id="sylPercent" style="color: var(--accent-color); font-weight: bold; font-size: 1.2em;">0%</span>
+        </div>
+        <div class="progress-container"><div class="progress-bar" id="sylProgress"></div></div>
+        <div id="syllabusContainer"></div>
+    </div>
 
+    <div id="revTab" class="tab-content">
+        <h2>Spaced Repetition Matrix</h2>
+        <p style="font-size: 0.85em; color: var(--light-text); margin-bottom: 20px;">Log topics you studied today. Defeat the forgetting curve.</p>
+        <div class="row">
+            <input type="text" id="revTopic" placeholder="Topic Name (e.g., Maratha Admin)" required>
+            <select id="revSub" style="width: 30%;">
+                <option>History</option><option>GS 1</option><option>GS 2</option><option>GS 3</option><option>GS 4</option>
+            </select>
+        </div>
+        <button onclick="addRevision()" class="action-btn">Add to Radar</button>
+        <ul id="revList"></ul>
+    </div>
+
+    <div id="mainsTab" class="tab-content">
+        <h2>Mains Answer Ledger</h2>
+        <div class="row">
+            <select id="mainsSub" style="width: 60%;"><option>History Optional</option><option>GS 1</option><option>GS 2</option><option>GS 3</option><option>GS 4</option><option>Essay</option></select>
+            <input type="number" id="mainsQ" placeholder="Qs Written" min="1" style="width: 40%;">
+        </div>
+        <textarea id="mainsMistake" placeholder="Critical analysis: Missed keywords? Poor structure? Over time limit? Log it to fix it."></textarea>
+        <button onclick="addMainsLog()" class="action-btn">Commit to Ledger</button>
         <ul id="mainsList"></ul>
     </div>
 
-    <div id="podcastTab" class="tab-content">
-        <h2>Podcast Insights</h2>
-        <form class="log-form" id="podcastForm">
-            <input type="text" id="podTitle" placeholder="Podcast Name / Topic" required>
-            <textarea id="podLearnt" placeholder="Key Takeaways..." required></textarea>
-            <textarea id="podUtility" placeholder="Interview Utility / DAF connection..." required></textarea>
-            <button type="submit" class="action-btn">Save Audio Log</button>
-        </form>
-        <ul id="podcastList"></ul>
+    <div id="podTab" class="tab-content">
+        <h2>Interview Audio Logs</h2>
+        <input type="text" id="podTitle" placeholder="Podcast/Episode Topic" style="margin-bottom: 10px;">
+        <textarea id="podLearn" placeholder="Key Data & Arguments..." style="margin-bottom: 10px;"></textarea>
+        <textarea id="podUtil" placeholder="How to use in GS/Interview/DAF..." style="margin-bottom: 10px;"></textarea>
+        <button onclick="addPod()" class="action-btn">Archive Insight</button>
+        <ul id="podList"></ul>
+    </div>
+
+    <div id="statTab" class="tab-content">
+        <h2>Performance Analytics</h2>
+        <p style="font-size: 0.85em; color: var(--light-text);">7-Day Focus Trajectory</p>
+        
+        <div class="chart-container" id="chartBox"></div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; margin-bottom: 25px;">
+            <div style="padding: 20px; background: rgba(255,170,0,0.1); border-radius: 8px; border: 1px solid var(--accent-color); text-align: center;">
+                <h3 style="margin:0 0 5px 0; color: var(--accent-color); font-size: 0.9em;">Total Answers</h3>
+                <div style="font-size: 2em; font-weight: bold; color: var(--text-color);" id="totalAnswers">0</div>
+            </div>
+            <div style="padding: 20px; background: rgba(0,255,136,0.1); border-radius: 8px; border: 1px solid var(--success); text-align: center;">
+                <h3 style="margin:0 0 5px 0; color: var(--success); font-size: 0.9em;">Topics in Radar</h3>
+                <div style="font-size: 2em; font-weight: bold; color: var(--text-color);" id="totalRadar">0</div>
+            </div>
+        </div>
+
+        <h2>Detailed Session Logs</h2>
+        <ul id="sessionList"></ul>
     </div>
 
 </div>
 
 <script>
-    // Tab Logic
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        event.currentTarget.classList.add('active');
+    // --- THEME ENGINE ---
+    const savedTheme = localStorage.getItem('v6Theme') || 'dark';
+    document.getElementById('themeSelect').value = savedTheme;
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    window.changeTheme = function() {
+        const t = document.getElementById('themeSelect').value;
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('v6Theme', t);
     }
 
-    // --- TIMER LOGIC ---
-    let startTime, updatedTime, difference, tInterval;
-    let running = false;
-    let savedTime = parseInt(localStorage.getItem('savedTimer')) || 0;
+    // --- DAILY RESET & HABITS ---
+    let lastLogin = localStorage.getItem('v6LastLogin');
+    const todayStr = new Date().toLocaleDateString();
+    let dailyHours = JSON.parse(localStorage.getItem('v6DailyHours')) || {};
+    
+    if (lastLogin !== todayStr) {
+        localStorage.setItem('v6LastLogin', todayStr);
+        localStorage.setItem('v6HabitCycle', 'false');
+        localStorage.setItem('v6HabitAyur', 'false');
+        localStorage.setItem('v6Targets', '[]'); // Clear daily targets
+    }
+    
+    document.getElementById('habitCycle').checked = JSON.parse(localStorage.getItem('v6HabitCycle')) || false;
+    document.getElementById('habitAyur').checked = JSON.parse(localStorage.getItem('v6HabitAyur')) || false;
+    window.saveHabits = function() {
+        localStorage.setItem('v6HabitCycle', document.getElementById('habitCycle').checked);
+        localStorage.setItem('v6HabitAyur', document.getElementById('habitAyur').checked);
+    }
 
+    // --- DISCIPLINE ENFORCER (DAANT) ---
+    let yDate = new Date(); yDate.setDate(yDate.getDate() - 1);
+    const yesterdayStr = yDate.toLocaleDateString();
+    let hasDismissedDaant = sessionStorage.getItem('v6DaantDismissed'); 
+
+    if (!hasDismissedDaant) {
+        let yHrs = dailyHours[yesterdayStr] || 0;
+        if(Object.keys(dailyHours).length > 0 && yHrs < 1.5) {
+            document.getElementById('daantModal').style.display = 'flex';
+        }
+    }
+    window.dismissDaant = function() {
+        document.getElementById('daantModal').style.display = 'none';
+        sessionStorage.setItem('v6DaantDismissed', 'true');
+    }
+
+    // --- QUOTES & DATES ---
+    const quotes = [
+        { text: "Tumhari ek choti si jeet ke peeche, tumhare maa-baap ke barson ka maun sangharsh chhipa hai.", author: "The Unspoken Sacrifices" },
+        { text: "Tumne is exam ke liye apna pyaar kurbaan kiya hai. Is dard ko apni taqat banao. LBSNAA is waiting.", author: "The Heartbreak Fuel" },
+        { text: "They left because of the struggle; make sure you stay for the victory.", author: "Revenge of Success" },
+        { text: "Karmanye Vadhikaraste Ma Phaleshu Kadachana. Don't worry about the results, perfect your execution.", author: "Bhagavad Gita" },
+        { text: "If you fall, just get back up and start pedaling again. We move forward together.", author: "Shingo Kinjou (Yowamushi Pedal)" }
+    ];
+    const q = quotes[Math.floor(Math.random() * quotes.length)];
+    document.getElementById('quoteText').innerText = `"${q.text}"`;
+    document.getElementById('quoteAuthor').innerText = `- ${q.author}`;
+
+    const now = new Date().getTime();
+    document.getElementById('preDays').innerText = Math.max(0, Math.ceil((new Date('May 24, 2026').getTime() - now) / 86400000));
+    document.getElementById('mainsDays').innerText = Math.max(0, Math.ceil((new Date('August 21, 2026').getTime() - now) / 86400000));
+
+    // --- TABS ---
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(id === 'statTab') { renderAnalytics(); renderSessions(); }
+    }
+
+    // --- TIMER & POMODORO ---
+    let startTime, difference = 0, tInterval, running = false, isPomodoro = false;
+    let savedTime = parseInt(localStorage.getItem('v6Timer')) || 0;
     const display = document.getElementById('display');
 
     function updateDisplay(time) {
-        let hours = Math.floor((time % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        let minutes = Math.floor((time % (1000 * 60 * 60)) / (1000 * 60));
-        let seconds = Math.floor((time % (1000 * 60)) / 1000);
-        hours = (hours < 10) ? "0" + hours : hours;
-        minutes = (minutes < 10) ? "0" + minutes : minutes;
-        seconds = (seconds < 10) ? "0" + seconds : seconds;
-        display.innerHTML = hours + ":" + minutes + ":" + seconds;
+        let h = Math.floor((time % 86400000) / 3600000); let m = Math.floor((time % 3600000) / 60000); let s = Math.floor((time % 60000) / 1000);
+        display.innerHTML = (h<10?"0"+h:h) + ":" + (m<10?"0"+m:m) + ":" + (s<10?"0"+s:s);
     }
-    
-    // Init display with saved time
     updateDisplay(savedTime);
 
-    function getShowTime(){
-        updatedTime = new Date().getTime();
-        difference =  updatedTime - startTime + savedTime;
-        updateDisplay(difference);
-        localStorage.setItem('savedTimer', difference);
+    function startTimer() {
+        if(!running) { isPomodoro = false; startTime = new Date().getTime(); tInterval = setInterval(() => { difference = new Date().getTime() - startTime + savedTime; updateDisplay(difference); localStorage.setItem('v6Timer', difference); }, 1000); running = true; }
     }
-
-    function startTimer(){
-        if(!running){
-            startTime = new Date().getTime();
-            tInterval = setInterval(getShowTime, 1000);
-            running = true;
+    function startPomodoro() {
+        if(!running) {
+            isPomodoro = true; let pomoDuration = 50 * 60 * 1000; let targetTime = new Date().getTime() + pomoDuration;
+            tInterval = setInterval(() => {
+                let remaining = targetTime - new Date().getTime();
+                if(remaining <= 0) { clearInterval(tInterval); running = false; savedTime += pomoDuration; localStorage.setItem('v6Timer', savedTime); alert("Pomodoro Complete! Take a 10 min break."); updateDisplay(savedTime); } 
+                else { updateDisplay(remaining); }
+            }, 1000); running = true;
         }
     }
+    function pauseTimer() { if(running) { clearInterval(tInterval); if(!isPomodoro) savedTime = difference; running = false; updateDisplay(savedTime); } }
+    function resetTimer() { clearInterval(tInterval); savedTime = 0; difference = 0; running = false; updateDisplay(0); localStorage.setItem('v6Timer', 0); }
+    
+    function logStudySession() {
+        let activeTime = isPomodoro ? savedTime : (savedTime || difference);
+        if(activeTime < 60000) return alert("Kam se kam 1 minute toh padho! No fake logs allowed.");
+        
+        let hrs = activeTime / 3600000; let mins = Math.round(activeTime / 60000);
+        
+        // Log Total Hours for Daant & Charts
+        dailyHours[todayStr] = (dailyHours[todayStr] || 0) + hrs;
+        localStorage.setItem('v6DailyHours', JSON.stringify(dailyHours));
 
-    function pauseTimer(){
-        if(running){
-            clearInterval(tInterval);
-            savedTime = difference;
-            running = false;
+        // Log Specific Session
+        let sData = JSON.parse(localStorage.getItem('v6Sessions')) || [];
+        sData.unshift({ id: Date.now(), date: todayStr, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), duration: mins + " mins", type: isPomodoro ? "Pomodoro" : "Standard" });
+        localStorage.setItem('v6Sessions', JSON.stringify(sData));
+
+        alert(`Session Logged: ${mins} minutes. LBSNAA is one step closer.`);
+        resetTimer(); renderAnalytics(); renderSessions();
+    }
+
+    // --- SYLLABUS DATA ---
+    const syllabusData = {
+        "History: Ancient & Medieval": ["Sources & Prehistory", "Indus Valley", "Mauryan Empire", "Guptas", "Delhi Sultanate", "Mughal Empire", "Marathas"],
+        "History: Modern & World": ["British Expansion", "Freedom Struggle: Early Phase", "Gandhi Mass Movements", "Industrial Revolution", "World Wars"],
+        "GS 1: Society & Geo": ["Art & Culture", "Modern Indian History", "Geography of World", "Indian Society"],
+        "GS 2: Polity & IR": ["Indian Constitution", "Parliament & Exec.", "Governance", "Social Justice", "Int. Relations"],
+        "GS 3: Econ & Security": ["Economy & Planning", "Agriculture", "Sci & Tech", "Environment", "Internal Security"],
+        "GS 4: Ethics": ["Ethics & Human Interface", "Emotional Intelligence", "Moral Thinkers", "Probity in Gov", "Case Studies"]
+    };
+
+    let savedSyllabus = JSON.parse(localStorage.getItem('v6Syl')) || {};
+    function renderSyllabus() {
+        const cont = document.getElementById('syllabusContainer'); cont.innerHTML = '';
+        let tItems = 0, cItems = 0;
+        for (const [section, topics] of Object.entries(syllabusData)) {
+            let details = document.createElement('details'); details.innerHTML = `<summary>${section}</summary>`;
+            let div = document.createElement('div'); div.className = 'syllabus-items';
+            topics.forEach((topic, idx) => {
+                tItems++; let key = `${section}_${idx}`; if(savedSyllabus[key]) cItems++;
+                div.innerHTML += `<label><input type="checkbox" onchange="toggleSyllabus('${key}')" ${savedSyllabus[key]?'checked':''}> ${topic}</label>`;
+            });
+            details.appendChild(div); cont.appendChild(details);
         }
+        let pct = tItems === 0 ? 0 : Math.round((cItems/tItems)*100);
+        document.getElementById('sylProgress').style.width = pct + '%'; document.getElementById('sylPercent').innerText = pct + '%';
+    }
+    window.toggleSyllabus = function(key) { savedSyllabus[key] = !savedSyllabus[key]; localStorage.setItem('v6Syl', JSON.stringify(savedSyllabus)); renderSyllabus(); }
+    renderSyllabus();
+
+    // --- REVISION RADAR ---
+    function renderRevList() {
+        let d = JSON.parse(localStorage.getItem('v6Rev')) || [];
+        document.getElementById('revList').innerHTML = d.map((i, idx) => `<li style="flex-direction:column; align-items:flex-start;">
+            <div style="width:100%; display:flex; justify-content:space-between;">
+                <div><strong style="color:var(--primary-color)">[${i.sub}]</strong> <span style="font-weight:bold">${i.t}</span></div>
+                <button class="del-btn" onclick="delGen('v6Rev','revList',${i.id})">Drop</button>
+            </div>
+            <div style="font-size:0.8em; color:var(--light-text); margin-top:5px;">Logged: ${i.date}</div>
+            <div class="revision-checks">
+                <label><input type="checkbox" ${i.r1 ? 'checked':''} onchange="updateRev(${idx}, 'r1')"> R1 (3 Days)</label>
+                <label><input type="checkbox" ${i.r2 ? 'checked':''} onchange="updateRev(${idx}, 'r2')"> R2 (7 Days)</label>
+                <label><input type="checkbox" ${i.r3 ? 'checked':''} onchange="updateRev(${idx}, 'r3')"> R3 (30 Days)</label>
+            </div>
+        </li>`).join('');
+    }
+    window.addRevision = function() { let t=document.getElementById('revTopic').value; if(!t)return; let d=JSON.parse(localStorage.getItem('v6Rev'))||[]; d.unshift({id:Date.now(), t:t, sub:document.getElementById('revSub').value, date:todayStr, r1:false, r2:false, r3:false}); localStorage.setItem('v6Rev',JSON.stringify(d)); document.getElementById('revTopic').value=''; renderRevList(); renderAnalytics(); }
+    window.updateRev = function(idx, p) { let d=JSON.parse(localStorage.getItem('v6Rev')); d[idx][p] = !d[idx][p]; localStorage.setItem('v6Rev', JSON.stringify(d)); }
+
+    // --- GENERIC CRUD (Targets, Mains, Pods) ---
+    function renderGen(key, listId, formatter) {
+        let d = JSON.parse(localStorage.getItem(key)) || [];
+        document.getElementById(listId).innerHTML = d.map(i => `<li ${i.m||i.u?'style="flex-direction:column;align-items:flex-start"':''}>${formatter(i)}<button class="del-btn" onclick="delGen('${key}','${listId}',${i.id})">X</button></li>`).join('');
+    }
+    window.delGen = function(key, listId, id) {
+        let d = JSON.parse(localStorage.getItem(key)) || []; localStorage.setItem(key, JSON.stringify(d.filter(i => i.id !== id)));
+        if(key==='v6Targets') renderGen(key, listId, i=>`<div><strong style="color:var(--primary-color)">[${i.sub}]</strong> ${i.t}</div>`);
+        if(key==='v6Mains') { renderGen(key, listId, i=>`<div style="width:100%"><strong style="color:var(--accent-color)">${i.sub} - ${i.q} Qs</strong><div style="font-size:0.85em;color:var(--light-text);margin:8px 0;background:rgba(128,128,128,0.1);padding:8px;border-left:2px solid var(--danger)">${i.m}</div></div>`); renderAnalytics(); }
+        if(key==='v6Pods') renderGen(key, listId, i=>`<div style="width:100%"><strong style="color:var(--primary-color)">${i.t}</strong><div style="font-size:0.85em;color:var(--light-text);margin-top:5px"><strong>L:</strong> ${i.l}<br><strong>U:</strong> ${i.u}</div></div>`);
+        if(key==='v6Rev') { renderRevList(); renderAnalytics(); }
+        if(key==='v6Sessions') { renderSessions(); }
     }
 
-    function resetTimer(){
-        clearInterval(tInterval);
-        savedTime = 0;
-        difference = 0;
-        running = false;
-        display.innerHTML = "00:00:00";
-        localStorage.setItem('savedTimer', 0);
-    }
+    window.addTask = function() { let v=document.getElementById('taskInput').value; if(!v)return; let d=JSON.parse(localStorage.getItem('v6Targets'))||[]; d.push({id:Date.now(), t:v, sub:document.getElementById('taskSub').value}); localStorage.setItem('v6Targets',JSON.stringify(d)); document.getElementById('taskInput').value=''; renderGen('v6Targets', 'taskList', i=>`<div><strong style="color:var(--primary-color)">[${i.sub}]</strong> ${i.t}</div>`); }
+    window.addMainsLog = function() { let q=document.getElementById('mainsQ').value; if(!q)return; let d=JSON.parse(localStorage.getItem('v6Mains'))||[]; d.push({id:Date.now(), sub:document.getElementById('mainsSub').value, q:parseInt(q), m:document.getElementById('mainsMistake').value}); localStorage.setItem('v6Mains',JSON.stringify(d)); document.getElementById('mainsQ').value=''; document.getElementById('mainsMistake').value=''; renderGen('v6Mains', 'mainsList', i=>`<div style="width:100%"><strong style="color:var(--accent-color)">${i.sub} - ${i.q} Qs</strong><div style="font-size:0.85em;color:var(--light-text);margin:8px 0;background:rgba(128,128,128,0.1);padding:8px;border-left:2px solid var(--danger)">${i.m}</div></div>`); renderAnalytics(); }
+    window.addPod = function() { let t=document.getElementById('podTitle').value; if(!t)return; let d=JSON.parse(localStorage.getItem('v6Pods'))||[]; d.push({id:Date.now(), t:t, l:document.getElementById('podLearn').value, u:document.getElementById('podUtil').value}); localStorage.setItem('v6Pods',JSON.stringify(d)); document.getElementById('podTitle').value=''; document.getElementById('podLearn').value=''; document.getElementById('podUtil').value=''; renderGen('v6Pods', 'podList', i=>`<div style="width:100%"><strong style="color:var(--primary-color)">${i.t}</strong><div style="font-size:0.85em;color:var(--light-text);margin-top:5px"><strong>Learn:</strong> ${i.l}<br><strong>Util:</strong> ${i.u}</div></div>`); }
 
-
-    // --- MAINS ANSWER WRITING LOGIC ---
-    let mainsLogs = JSON.parse(localStorage.getItem('mainsLogs')) || [];
-
-    document.getElementById('mainsForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        mainsLogs.unshift({
-            id: Date.now(),
-            date: new Date().toLocaleDateString(),
-            subject: document.getElementById('mainsSubject').value,
-            count: document.getElementById('qCount').value,
-            mistakes: document.getElementById('mainsMistakes').value
+    // --- ANALYTICS ---
+    function renderAnalytics() {
+        const box = document.getElementById('chartBox'); box.innerHTML = '';
+        let maxH = 0, dArr = [];
+        for(let i=6; i>=0; i--) {
+            let d = new Date(); d.setDate(d.getDate() - i);
+            let k = d.toLocaleDateString(); let h = dailyHours[k] || 0;
+            if(h > maxH) maxH = h; dArr.push({lbl: d.getDate()+'/'+(d.getMonth()+1), val: h});
+        }
+        dArr.forEach(d => {
+            let pct = maxH===0?0:Math.min(100, (d.val/Math.max(8, maxH))*100);
+            box.innerHTML += `<div class="bar-wrap"><div class="chart-val">${d.val>0?d.val.toFixed(1)+'h':''}</div><div class="chart-bar" style="height:${pct}%"></div><div class="chart-label">${d.lbl}</div></div>`;
         });
-        document.getElementById('qCount').value = '';
-        document.getElementById('mainsMistakes').value = '';
-        saveAndRenderMains();
-    });
-
-    window.deleteMainsLog = function(id) {
-        mainsLogs = mainsLogs.filter(log => log.id !== id);
-        saveAndRenderMains();
+        document.getElementById('totalAnswers').innerText = (JSON.parse(localStorage.getItem('v6Mains'))||[]).reduce((s,i)=>s+i.q, 0);
+        document.getElementById('totalRadar').innerText = (JSON.parse(localStorage.getItem('v6Rev'))||[]).length;
     }
 
-    function saveAndRenderMains() {
-        localStorage.setItem('mainsLogs', JSON.stringify(mainsLogs));
-        const list = document.getElementById('mainsList');
-        list.innerHTML = '';
-        mainsLogs.forEach(log => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div class="mains-stats">
-                        <span class="subject-tag">${log.subject}</span>
-                        <span style="color:#888; font-size:0.8em;">| ${log.date}</span>
-                    </div>
-                    <button class="delete-btn" onclick="deleteMainsLog(${log.id})">X</button>
-                </div>
-                <div class="q-count">✏️ ${log.count} Questions Written</div>
-                <div class="mistake-box">
-                    <strong>Critical Review:</strong><br>
-                    ${log.mistakes.replace(/\n/g, '<br>')}
-                </div>
-            `;
-            list.appendChild(li);
-        });
-    }
-    saveAndRenderMains();
-
-
-    // --- STUDY TARGETS LOGIC ---
-    let tasks = JSON.parse(localStorage.getItem('studyTargetsV2')) || [];
-    document.getElementById('taskForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        tasks.push({
-            id: Date.now(),
-            text: document.getElementById('taskInput').value,
-            subject: document.getElementById('subjectSelect').value
-        });
-        document.getElementById('taskInput').value = '';
-        saveAndRenderTasks();
-    });
-
-    window.deleteTask = function(id) {
-        tasks = tasks.filter(task => task.id !== id);
-        saveAndRenderTasks();
+    function renderSessions() {
+        let d = JSON.parse(localStorage.getItem('v6Sessions')) || [];
+        document.getElementById('sessionList').innerHTML = d.map(i => `<li style="flex-direction:column; align-items:flex-start;">
+            <div style="display:flex; justify-content:space-between; width:100%;"><strong>${i.date} | ${i.time}</strong> <span style="color:var(--success); font-weight:bold;">${i.duration}</span></div>
+            <div class="session-log">Session Type: ${i.type}</div>
+            <button class="del-btn" style="margin-top:10px" onclick="delGen('v6Sessions','sessionList',${i.id})">Delete Log</button>
+        </li>`).join('');
     }
 
-    function saveAndRenderTasks() {
-        localStorage.setItem('studyTargetsV2', JSON.stringify(tasks));
-        const taskList = document.getElementById('taskList');
-        taskList.innerHTML = '';
-        tasks.forEach(task => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <span class="subject-tag">${task.subject}</span>
-                        <span style="margin-left: 10px; font-weight:bold;">${task.text}</span>
-                    </div>
-                    <button class="delete-btn" onclick="deleteTask(${task.id})">X</button>
-                </div>
-            `;
-            taskList.appendChild(li);
-        });
-    }
-    saveAndRenderTasks();
-
-
-    // --- PODCAST LOGIC ---
-    let podcasts = JSON.parse(localStorage.getItem('podcastLogsV2')) || [];
-    document.getElementById('podcastForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        podcasts.unshift({
-            id: Date.now(),
-            title: document.getElementById('podTitle').value,
-            learnt: document.getElementById('podLearnt').value,
-            utility: document.getElementById('podUtility').value
-        });
-        document.getElementById('podTitle').value = '';
-        document.getElementById('podLearnt').value = '';
-        document.getElementById('podUtility').value = '';
-        saveAndRenderPodcasts();
-    });
-
-    window.deletePodcast = function(id) {
-        podcasts = podcasts.filter(p => p.id !== id);
-        saveAndRenderPodcasts();
-    }
-
-    function saveAndRenderPodcasts() {
-        localStorage.setItem('podcastLogsV2', JSON.stringify(podcasts));
-        const list = document.getElementById('podcastList');
-        list.innerHTML = '';
-        podcasts.forEach(pod => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <div style="display:flex; justify-content:space-between;">
-                    <strong style="color:var(--primary-color);">${pod.title}</strong>
-                    <button class="delete-btn" onclick="deletePodcast(${pod.id})">X</button>
-                </div>
-                <div style="font-size:0.9em; margin-top:10px;">
-                    <div style="color:#aaa;"><strong>Learnings:</strong> ${pod.learnt}</div>
-                    <div style="color:#aaa; margin-top:5px;"><strong>Utility:</strong> ${pod.utility}</div>
-                </div>
-            `;
-            list.appendChild(li);
-        });
-    }
-    saveAndRenderPodcasts();
+    // Init
+    renderRevList(); renderAnalytics(); renderSessions();
+    renderGen('v6Targets', 'taskList', i=>`<div><strong style="color:var(--primary-color)">[${i.sub}]</strong> ${i.t}</div>`);
+    renderGen('v6Mains', 'mainsList', i=>`<div style="width:100%"><strong style="color:var(--accent-color)">${i.sub} - ${i.q} Qs</strong><div style="font-size:0.85em;color:var(--light-text);margin:8px 0;background:rgba(128,128,128,0.1);padding:8px;border-left:2px solid var(--danger)">${i.m}</div></div>`);
+    renderGen('v6Pods', 'podList', i=>`<div style="width:100%"><strong style="color:var(--primary-color)">${i.t}</strong><div style="font-size:0.85em;color:var(--light-text);margin-top:5px"><strong>Learn:</strong> ${i.l}<br><strong>Util:</strong> ${i.u}</div></div>`);
 </script>
-
 </body>
 </html>
