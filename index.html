@@ -3,154 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UPSC Elite Command Center V8</title>
+    <title>UPSC Sovereign V9 | Professional Data Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #ffaa00; --cyan: #00f2ff; --bg: #050608; }
-        body { background-color: var(--bg); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 28px; }
-        .glow-gold { box-shadow: 0 0 20px rgba(255, 170, 0, 0.15); }
-        #timerDisplay { font-variant-numeric: tabular-nums; letter-spacing: -2px; background: linear-gradient(to bottom, #fff, #999); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .timeline-line { position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--cyan), var(--gold), transparent); }
+        :root { --gold: #ffaa00; --cyan: #00f2ff; --bg: #020305; }
+        body { background-color: var(--bg); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        .glass-panel { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 32px; }
+        .interactive-btn { transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.1); }
+        .interactive-btn:active { transform: scale(0.95); background: var(--gold); color: black; }
+        input { background: rgba(255,255,255,0.05) !important; border: 1px solid var(--gold) !important; color: white !important; padding: 10px; border-radius: 8px; }
     </style>
 </head>
-<body class="p-6 md:p-12 lg:p-16">
+<body class="p-6 md:p-16">
 
-    <header class="flex justify-between items-end mb-16">
-        <div>
-            <h1 class="text-4xl font-extrabold tracking-tighter uppercase italic">Aman's <span class="text-[#ffaa00]">Sovereign</span></h1>
-            <p class="text-sm opacity-50 font-serif italic mt-2">"Turn the heartbreak of the past into the Rank of your future."</p>
-        </div>
-        <div class="text-right">
-            <div class="text-[10px] text-[#00f2ff] font-bold tracking-[0.3em] uppercase mb-1">Elite Status</div>
-            <div class="text-2xl font-black">LBSNAA 2026</div>
-        </div>
+    <header class="mb-12 border-l-4 border-[#ffaa00] pl-8">
+        <h1 class="text-5xl font-black tracking-tighter italic">AMAN <span class="text-[#ffaa00]">SOVEREIGN V9</span></h1>
+        <p class="text-gray-500 font-serif italic mt-2 italic">"Full System Access: Data-Driven Rank Acquisition."</p>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-        
-        <div class="lg:col-span-8 glass p-12 text-center relative overflow-hidden glow-gold">
-            <div class="absolute top-8 left-10 flex items-center gap-2">
-                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Focus Session Active</span>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div class="glass-panel p-8 col-span-2">
+            <h3 class="text-[#ffaa00] font-black uppercase tracking-widest text-xs mb-6 text-center">Mastery Data Entry (Harvard Audit)</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div><label class="text-[10px] block mb-1">GS 1 %</label><input type="number" id="gs1" value="60" class="w-full"></div>
+                <div><label class="text-[10px] block mb-1">GS 2 %</label><input type="number" id="gs2" value="45" class="w-full"></div>
+                <div><label class="text-[10px] block mb-1">GS 3 %</label><input type="number" id="gs3" value="40" class="w-full"></div>
+                <div><label class="text-[10px] block mb-1">GS 4 %</label><input type="number" id="gs4" value="85" class="w-full"></div>
+                <div><label class="text-[10px] block mb-1">Hist I %</label><input type="number" id="hi1" value="55" class="w-full"></div>
+                <div><label class="text-[10px] block mb-1">Hist II %</label><input type="number" id="hi2" value="40" class="w-full"></div>
             </div>
-            <div id="timerDisplay" class="text-9xl font-black my-10">00:00:00</div>
-            <div class="flex flex-wrap justify-center gap-4">
-                <button onclick="toggleTimer()" id="timerBtn" class="bg-white text-black px-10 py-4 rounded-full font-black uppercase text-xs tracking-widest hover:scale-105 transition">Start Mission</button>
-                <button onclick="pomo50()" class="bg-[#ffaa00]/20 text-[#ffaa00] border border-[#ffaa00]/30 px-8 py-4 rounded-full font-black uppercase text-xs tracking-widest hover:bg-[#ffaa00] hover:text-black transition">50m Pomodoro</button>
-                <button onclick="logWork()" class="bg-[#00f2ff]/20 text-[#00f2ff] border border-[#00f2ff]/30 px-8 py-4 rounded-full font-black uppercase text-xs tracking-widest hover:bg-[#00f2ff] hover:text-black transition">Log Grit</button>
-            </div>
+            <button onclick="updateCharts()" class="w-full mt-6 bg-[#ffaa00] text-black font-black py-3 rounded-xl text-xs uppercase tracking-widest">Update LBSNAA Radar</button>
         </div>
 
-        <div class="lg:col-span-4 space-y-8">
-            <div class="glass p-8 text-center flex flex-col justify-center h-1/2">
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Scholar's Chain</span>
-                <div id="streakVal" class="text-7xl font-black text-[#ffaa00] my-2">0</div>
-                <button onclick="forgeLink()" class="mt-4 border border-[#ffaa00]/30 py-2 rounded-xl text-[10px] font-bold text-[#ffaa00] uppercase tracking-widest">Forge Daily Link</button>
-            </div>
-            <div class="glass p-8 text-center flex flex-col justify-center h-1/2">
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Grit Score (Hrs)</span>
-                <div id="gritVal" class="text-7xl font-black text-[#00f2ff] my-2">0.0</div>
+        <div class="glass-panel p-8 text-center flex flex-col justify-center">
+            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">MIT Grit Tracker</h3>
+            <div id="gritDisplay" class="text-8xl font-black text-[#00f2ff] my-4">0.0</div>
+            <div class="flex gap-2">
+                <input type="number" id="sessionHrs" placeholder="Add Hrs" class="w-1/2">
+                <button onclick="addGrit()" class="w-1/2 bg-[#00f2ff] text-black font-bold rounded-lg text-xs uppercase">Log Grit</button>
             </div>
         </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-        <div class="glass p-10">
-            <h3 class="text-xs font-bold text-[#ffaa00] uppercase tracking-[0.2em] mb-8">Weekly Grit Heatmap</h3>
+        <div class="glass-panel p-10 h-96">
+            <h4 class="text-xs font-bold uppercase mb-8">Weekly Productive Heatmap</h4>
             <canvas id="weeklyChart"></canvas>
         </div>
-        <div class="glass p-10">
-            <h3 class="text-xs font-bold text-[#00f2ff] uppercase tracking-[0.2em] mb-8">Syllabus Mastery Radar</h3>
+        <div class="glass-panel p-10 h-96">
+            <h4 class="text-xs font-bold uppercase mb-8">Subject Mastery Radar</h4>
             <canvas id="radarChart"></canvas>
         </div>
     </div>
 
-    <div class="glass p-12">
-        <h3 class="text-2xl font-black italic uppercase tracking-tighter text-[#ffaa00] mb-12">History Path: Plassey to Partition</h3>
-        <div class="relative pl-12 space-y-16">
-            <div class="timeline-line"></div>
+    <div class="glass-panel p-12">
+        <h3 class="text-2xl font-black italic text-[#ffaa00] mb-10">History Path Access</h3>
+        <div class="space-y-8 border-l border-gray-800 ml-4 pl-10 relative">
             <div class="relative">
-                <div class="absolute -left-[51px] top-1 w-3 h-3 rounded-full bg-[#00f2ff] shadow-[0_0_15px_#00f2ff]"></div>
-                <h4 class="text-xl font-black">ANCIENT & MEDIEVAL INDIA</h4>
-                <p class="text-sm text-gray-500 mt-1">Focus: Mauryan Bureaucracy & Mughal Administrative Reforms</p>
+                <div class="absolute -left-[45px] top-1 w-2.5 h-2.5 rounded-full bg-[#00f2ff]"></div>
+                <h5 class="font-bold">Ancient & Medieval</h5>
+                <select class="bg-transparent border-b border-gray-700 text-xs mt-2 text-gray-400">
+                    <option>In Progress</option>
+                    <option selected>Mastered</option>
+                </select>
             </div>
             <div class="relative">
-                <div class="absolute -left-[51px] top-1 w-3 h-3 rounded-full bg-[#ffaa00] shadow-[0_0_15px_#ffaa00]"></div>
-                <h4 class="text-xl font-black italic">1757: THE BATTLE OF PLASSEY</h4>
-                <p class="text-sm text-gray-400 mt-1">Reading: Sekhar Bandyopadhyay - The Transition to Colonialism</p>
-                <div class="mt-4 grid grid-cols-3 gap-4">
-                    <div class="p-3 bg-white/5 rounded-lg text-[10px] text-gray-400 font-bold uppercase">Context</div>
-                    <div class="p-3 bg-white/5 rounded-lg text-[10px] text-gray-400 font-bold uppercase">Contention</div>
-                    <div class="p-3 bg-white/5 rounded-lg text-[10px] text-gray-400 font-bold uppercase">Impact</div>
-                </div>
+                <div class="absolute -left-[45px] top-1 w-2.5 h-2.5 rounded-full bg-[#ffaa00]"></div>
+                <h5 class="font-bold italic">1757: Battle of Plassey</h5>
+                <select id="plasseyStatus" onchange="updateTimeline()" class="bg-transparent border-b border-gray-700 text-xs mt-2 text-[#ffaa00]">
+                    <option selected>Reading (Bandyopadhyay)</option>
+                    <option>Analysis Complete</option>
+                    <option>PYQ Mastered</option>
+                </select>
             </div>
         </div>
     </div>
 
     <script>
-        let startTime, timerInterval, elapsed = 0, running = false;
-        let streak = parseInt(localStorage.getItem('v8_streak')) || 0;
-        let grit = parseFloat(localStorage.getItem('v8_grit')) || 0.0;
-        let gritHistory = JSON.parse(localStorage.getItem('v8_history')) || [2, 4, 1, 5, 3, 2, 0];
+        let radar, weekly;
+        let grit = parseFloat(localStorage.getItem('v9_grit')) || 0.0;
+        let gritHistory = JSON.parse(localStorage.getItem('v9_history')) || [2, 5, 3, 6, 4, 1, 0];
 
-        function updateDisplay(ms) {
-            let s = Math.floor(ms / 1000); let m = Math.floor(s / 60); let h = Math.floor(m / 60);
-            document.getElementById('timerDisplay').innerText = `${String(h).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+        function addGrit() {
+            let val = parseFloat(document.getElementById('sessionHrs').value) || 0;
+            grit += val; gritHistory[6] += val;
+            localStorage.setItem('v9_grit', grit.toFixed(1));
+            localStorage.setItem('v9_history', JSON.stringify(gritHistory));
+            initCharts();
+            document.getElementById('gritDisplay').innerText = grit.toFixed(1);
         }
 
-        function toggleTimer() {
-            if(!running) {
-                startTime = Date.now() - elapsed;
-                timerInterval = setInterval(() => { elapsed = Date.now() - startTime; updateDisplay(elapsed); }, 1000);
-                document.getElementById('timerBtn').innerText = "Pause Mission"; running = true;
-            } else {
-                clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "Resume Mission"; running = false;
-            }
+        function updateCharts() {
+            const data = [
+                document.getElementById('gs1').value, document.getElementById('gs2').value,
+                document.getElementById('gs3').value, document.getElementById('gs4').value,
+                document.getElementById('hi1').value, document.getElementById('hi2').value
+            ];
+            radar.data.datasets[0].data = data;
+            radar.update();
+            localStorage.setItem('v9_mastery', JSON.stringify(data));
         }
 
-        function pomo50() {
-            elapsed = 50 * 60 * 1000; updateDisplay(elapsed);
-            let target = Date.now() + elapsed;
-            timerInterval = setInterval(() => {
-                let rem = target - Date.now();
-                if(rem <= 0) { clearInterval(timerInterval); alert("Session Complete!"); logWork(0.83); }
-                else updateDisplay(rem);
-            }, 1000);
-        }
+        function initCharts() {
+            if(radar) radar.destroy();
+            if(weekly) weekly.destroy();
 
-        function logWork(manual) {
-            let hrs = manual || (elapsed / 3600000);
-            grit += hrs; gritHistory[6] += hrs;
-            localStorage.setItem('v8_grit', grit.toFixed(1));
-            localStorage.setItem('v8_history', JSON.stringify(gritHistory));
-            location.reload();
-        }
+            const savedMastery = JSON.parse(localStorage.getItem('v9_mastery')) || [60,45,40,85,55,40];
 
-        function forgeLink() {
-            streak++; localStorage.setItem('v8_streak', streak); location.reload();
-        }
-
-        window.onload = () => {
-            document.getElementById('streakVal').innerText = streak;
-            document.getElementById('gritVal').innerText = grit.toFixed(1);
-
-            new Chart(document.getElementById('weeklyChart'), {
-                type: 'bar',
-                data: { labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], datasets: [{ data: gritHistory, backgroundColor: '#ffaa00', borderRadius: 12 }] },
-                options: { scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#555' } } }, plugins: { legend: { display: false } } }
-            });
-
-            new Chart(document.getElementById('radarChart'), {
+            radar = new Chart(document.getElementById('radarChart'), {
                 type: 'radar',
                 data: {
                     labels: ['GS 1', 'GS 2', 'GS 3', 'GS 4', 'Hist I', 'Hist II'],
-                    datasets: [{ data: [65, 45, 35, 80, 55, 40], borderColor: '#00f2ff', backgroundColor: 'rgba(0, 242, 255, 0.05)', pointBackgroundColor: '#00f2ff' }]
+                    datasets: [{ data: savedMastery, borderColor: '#ffaa00', backgroundColor: 'rgba(255,170,0,0.1)' }]
                 },
-                options: { scales: { r: { grid: { color: '#222' }, angleLines: { display: false }, ticks: { display: false }, pointLabels: { color: '#888' } } }, plugins: { legend: { display: false } } }
+                options: { maintainAspectRatio: false, scales: { r: { grid: { color: '#222' }, angleLines: { display: false }, ticks: { display: false }, pointLabels: { color: '#888', font: { weight: 'bold' } } } }, plugins: { legend: { display: false } } }
             });
+
+            weekly = new Chart(document.getElementById('weeklyChart'), {
+                type: 'bar',
+                data: { labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], datasets: [{ data: gritHistory, backgroundColor: '#00f2ff', borderRadius: 10 }] },
+                options: { maintainAspectRatio: false, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#444' } } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        window.onload = () => {
+            document.getElementById('gritDisplay').innerText = grit.toFixed(1);
+            initCharts();
         };
     </script>
 </body>
